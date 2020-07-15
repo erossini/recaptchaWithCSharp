@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+
+<form method="post" name="contact">
+    <div id="ReCaptchContainer"></div>
+    <input name="recaptcha" id="recaptcha" />
+    <label id="lblMessage" runat="server" clientidmode="static"></label>
+    <br />
+    <input type="submit" value="Submit" />
+</form>
+
+@section Scripts {
+    <script src="https://www.google.com/recaptcha/api.js?render=@ViewBag.ClientSecret"></script>
+
+    <script type="text/javascript">
+        grecaptcha.ready(function () {
+            grecaptcha.execute('@ViewBag.ClientSecret', {
+                action: 'contact'
+            }).then(function (token) {
+                if (token) {
+                    document.getElementById('recaptcha').value = token;
+                }
+            });
+        });
+
+        var reCaptchaCallback = function (response) {
+            if (response !== '') {
+                document.getElementById('lblMessage').innerHTML = "";
+            }
+        };
+
+        jQuery('input[type="submit"]').on('click', (e) => {
+            var message = 'Please checck the checkbox';
+            if (typeof (grecaptcha) != 'undefined') {
+                var response = grecaptcha.getResponse();
+                (response.length === 0) ? (message = 'Captcha verification failed') : (message = '');
+            }
+            jQuery('#lblMessage').html(message);
+        });
+
+    </script>
+}
